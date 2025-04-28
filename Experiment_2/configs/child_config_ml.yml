@@ -1,0 +1,52 @@
+experiment:
+  backend: tensorflow
+  dataset: ml_child
+  data_config:
+    strategy: fixed
+    train_path: ../data/ml_rec_filtered/train_child.tsv
+    test_path: ../data/ml_rec_filtered/test_child.tsv
+    validation_path: ../data/ml_rec_filtered/validation_child.tsv
+  binarize: True
+  top_k: 50
+  evaluation:
+    cutoffs: [10,50]
+    simple_metrics: [nDCG, Recall, MAP, MRR]
+  gpu: 2
+  path_output_rec_result: ./results/ml_child/recommendations
+  path_output_rec_performance: ./results/ml_child/performance
+  path_output_rec_weight: ./results/ml_child/weights
+  path_log_folder: ../results/ml_child
+  external_models_path: ../external/models/__init__.py
+  models:
+    Random:
+      meta:
+        save_recs: True
+    external.MostPop:
+      meta:
+        verbose: True
+        save_recs: True
+    RP3beta: 
+      meta:
+        hyper_max_evals: 20
+        hyper_opt_alg: tpe
+        verbose: True
+        save_recs: True
+        validation_metric: nDCG@10
+      neighborhood: [quniform, 5, 1000, 1]
+      alpha: [uniform, 0, 2]
+      beta: [uniform, 0, 2]
+      normalize_similarity: [True, False]
+    iALS: 
+      meta:
+        hyper_max_evals: 20
+        hyper_opt_alg: tpe
+        verbose: True
+        save_recs: True
+        validation_rate: 10
+        validation_metric: nDCG@10
+      epochs: [uniform, 1, 250]
+      scaling: [linear, log]
+      factors: [quniform, 1, 200, 1]
+      alpha: [uniform, 10e-4, 50]
+      epsilon: [uniform, 10e-4, 10]
+      reg: [uniform, 10e-4, 10e-3]

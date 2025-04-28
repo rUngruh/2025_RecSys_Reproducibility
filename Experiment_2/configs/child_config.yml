@@ -1,0 +1,55 @@
+experiment:
+  backend: tensorflow
+  dataset: lfm_child_filtered_2013_temporal_split
+  data_config:
+    strategy: fixed
+    train_path: ../data/lfm_child_2013/train.tsv
+    test_path: ../data/lfm_child_2013/test.tsv
+    validation_path: ../data/lfm_child_2013/validation.tsv
+  # prefiltering:
+  #   - strategy: global_threshold
+  #     threshold: 4
+  #   - strategy: iterative_k_core
+  #     core: 10
+  binarize: True
+  top_k: 200
+  evaluation:
+    cutoffs: [50]
+    simple_metrics: [nDCG, Recall, MAP, MRR,ItemCoverage,Gini]
+  gpu: 2
+  path_output_rec_result: ../results/lfm_child_2013/recommendations
+  path_output_rec_performance: ../results/lfm_child_2013/performance
+  external_models_path: ../external/models/__init__.py
+  models:
+    Random:
+      meta:
+        save_recs: True
+    external.MostPop:
+      meta:
+        verbose: True
+        save_recs: True
+    RP3beta: 
+      meta:
+        hyper_max_evals: 10
+        hyper_opt_alg: tpe
+        verbose: True
+        save_recs: True
+        validation_metric: nDCG@10
+      neighborhood: [quniform, 5, 1000, 1]
+      alpha: [uniform, 0, 2]
+      beta: [uniform, 0, 2]
+      normalize_similarity: [True, False]
+    iALS: 
+      meta:
+        hyper_max_evals: 10
+        hyper_opt_alg: tpe
+        verbose: True
+        save_recs: True
+        validation_rate: 10
+        validation_metric: nDCG@10
+      epochs: [uniform, 1, 250]
+      scaling: [linear, log]
+      factors: [quniform, 1, 200, 1]
+      alpha: [uniform, 10e-4, 50]
+      epsilon: [uniform, 10e-4, 10]
+      reg: [uniform, 10e-4, 10e-3]

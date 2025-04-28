@@ -1,0 +1,39 @@
+ML_genres = []
+MLHD_genres = []
+BX_genres = []
+
+
+with open('ML_genres.txt', 'r') as f:
+    for line in f:
+        ML_genres.append(line.strip())
+
+
+with open('MLHD_genres.txt', 'r') as f:
+    for line in f:
+        MLHD_genres.append(line.strip())
+
+
+with open('BX_genres.txt', 'r') as f:
+    for line in f:
+        BX_genres.append(line.strip())
+        
+        
+def genre_dict_to_list(genre_dict, dataset):
+    if dataset == 'ml':
+        return [genre_dict[genre] for genre in ML_genres]
+    elif dataset == 'mlhd':
+        return [genre_dict[genre] for genre in MLHD_genres]
+    elif dataset == 'bx':
+        return [genre_dict[genre] for genre in BX_genres]
+    else:
+        return None
+    
+def genre_list_to_dict(genre_list, dataset):
+    if dataset == 'ml':
+        return {genre: genre_list[i] for i, genre in enumerate(ML_genres) if genre_list[i] != 0}
+    elif dataset == 'mlhd':
+        return {genre: genre_list[i] for i, genre in enumerate(MLHD_genres) if genre_list[i] != 0}
+    elif dataset == 'bx':
+        return {genre: genre_list[i] for i, genre in enumerate(BX_genres) if genre_list[i] != 0}
+    else:
+        return None
