@@ -14,7 +14,7 @@ ml_data_dir = dataset_dir + '/processed/movielens-1m'
 
 parser = argparse.ArgumentParser(description='Create user profiles in batches.')
 parser.add_argument('--dataset', type=str, help='Dataset to use (MLHD, BX, or ML)', choices=['mlhd', 'bx',  'ml'], required=True)
-parser.add_argument('--chunksize', type=int, default=1000000, help='Chunk size for processing listening events')
+parser.add_argument('--chunksize', type=int, default=10000000, help='Chunk size for processing listening events')
 parser.add_argument('--weighted', type=bool, help='Use weighted listening events', default=True)
 parser.add_argument('-in_batches', action='store_true', help='Process in batches')
 
@@ -30,15 +30,20 @@ if dataset == 'mlhd':
     user_profile_stats_path = mlhd_data_dir + '/user_profile_stats.tsv' if not weighted else mlhd_data_dir + '/user_profile_stats_weighted.tsv'
     interactions_path = mlhd_data_dir + '/interactions.tsv.bz2'
     artist_path = mlhd_data_dir + '/artists.tsv'
+    tracks_path = mlhd_data_dir + '/tracks.tsv'
     # user_path = mlhd_data_dir + '/users.tsv' # Not needed since column 'age_at_listen' exists
     
     compressed = True if interactions_path.endswith('.bz2') else False
     
     artists = pd.read_csv(artist_path, sep='\t')
     artists['genres'] = artists['genres'].apply(lambda x: x.split(','))
-    genre_dict = artists.set_index('artist_id')['genres'].to_dict()
+    genre_dict = {str(artist_id): genres for artist_id, genres in artists[['artist_id', 'genres']].values}
     
     
+    item_artists = pd.read_csv(tracks_path, sep='\t')
+    item_artist_dict = item_artists.set_index('item_id')['artist_id'].to_dict()
+    
+
 if dataset == 'bx':
     user_profile_stats_path = bx_data_dir + '/user_profile_stats.tsv' if not weighted else bx_data_dir + '/user_profile_stats_weighted.tsv'
 
@@ -76,25 +81,26 @@ if dataset == 'ml':
    
 #     interactions = pd.read_csv(interactions_path, sep='\t', compression='bz2' if compressed else None, chunksize=chunksize)
 
-if in_batches:                
+if in_batches:          
+     
     stats_profile_data = []
 
     user_genre_sums = {}
 
 
     user_items = {}
+         
     unique_items_per_user = {}
     interactions_per_user = {}
     interactions = 0
-    for i, chunk in enumerate(pd.read_csv(interactions_path, sep='\t', compression='bz2' if compressed else None, chunksize=chunksize)):
+    for i, chunk in enumerate(pd.read_csv(interactions_path, sep='\t', compression='bz2' if compressed else None, chunksize=chunksize, header=None)):
         if dataset == 'mlhd':
-            chunk.columns = ['user_id', 'timestamp', 'artist_id', 'item_id', 'age_at_listen']
+            chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen']
         if dataset == 'bx':
             chunk.columns = ['user_id', 'item_id', 'rating']
             
         if dataset == 'ml':
             chunk.columns = ['user_id', 'item_id', 'rating', 'timestamp']
-            
         interactions += len(chunk)
         if i % 10 == 0:
             print(f"Processing batch {i}, current batch size: {chunksize}") #; out of x billion, percentage: {(i * chunksize / x) * 100:.3f}%")
@@ -104,21 +110,19 @@ if in_batches:
             
             
         if weighted:
-            chunk_user_interactions_dict = (chunk
+            chunk_user_interactions_dict = (chunk.copy()
             .groupby(['user_id', 'age_at_listen'])
             .apply(lambda df: list(df['item_id']))
             .to_dict()
         )
         
         else:
-            chunk_user_interactions_dict = (chunk
+            chunk_user_interactions_dict = (chunk.copy()
                 .groupby(['user_id', 'age_at_listen'])
                 .apply(lambda df: list(set(df['item_id'])))
                 .to_dict()
             )
             
-        if dataset == 'mlhd':
-            item_artist_dict = chunk[['item_id', 'artist_id']].drop_duplicates().set_index('item_id')['artist_id'].to_dict()
         del chunk
 
         
@@ -148,34 +152,38 @@ if in_batches:
                     genre_item_id = item_artist_dict.get(item_id, None)
                 else:
                     genre_item_id = item_id
-                    
-                if ',' in genre_item_id:
+                if not isinstance(genre_item_id, int) and ',' in genre_item_id:
                     ids = genre_item_id.split(',')
+                    ids = [id for id in ids]
                     genres = set()
                     for id in ids:
                         genres.update(genre_dict.get(id, []))
                 else:
                     genres = genre_dict.get(genre_item_id, [])
                 
+                
                 for genre in genres:
                     if genre in user_genre_sums[key]:
                         user_genre_sums[key][genre] += 1 / len(genres)
                     else:
                         user_genre_sums[key][genre] = 1 / len(genres)
+                        
+    normalized_genre_sums = {}
         
     print(f"Processed {interactions} interactions.")
     print('Processed interactions. Now, computing genre distributions across users...')
-    for key, genres in user_genre_sums.items():
-        total_value = sum(genres.values())
-        user_genre_sums[key] = {genre: value / total_value for genre, value in genre_dict.items()}
+    for key, user_genres in user_genre_sums.items():
+        total_value = sum(user_genres.values())
+        normalized_genre_sums[key] = {genre: value / total_value for genre, value in user_genres.items()}
 
-    print('Processed user profiles.')
+
+
 
 
     print('Creating dataframes...')
     
     stats_profile_data = []
-    for key, user_genre_distribution in user_genre_sums.items():
+    for key, user_genre_distribution in normalized_genre_sums.items():
             stats_profile_data.append({
                 'user_id': key[0],
                 'age': key[1],
@@ -203,7 +211,7 @@ else: # if not in_batches:
     chunk = pd.read_csv(interactions_path, sep='\t', compression='bz2' if compressed else None)
     
     if dataset == 'mlhd':
-        chunk.columns = ['user_id', 'timestamp', 'artist_id', 'item_id', 'age_at_listen']
+        chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen']
     if dataset == 'bx':
         chunk.columns = ['user_id', 'item_id', 'rating']
     if dataset == 'ml':
@@ -227,8 +235,6 @@ else: # if not in_batches:
             .to_dict()
         )
         
-    if dataset == 'mlhd':
-        item_artist_dict = chunk[['item_id', 'artist_id']].drop_duplicates().set_index('item_id')['artist_id'].to_dict()
     del chunk
 
     

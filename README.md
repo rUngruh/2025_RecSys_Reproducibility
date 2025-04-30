@@ -65,6 +65,7 @@ We utilize the [Book-Data](https://bookdata.piret.info/) tool to extract isbn's 
 ### Book Crossing
 ```
 python create_user_profiles_in_batches.py --dataset bx --weighted True
+python create_user_profiles_in_batches.py --dataset mlhd --weighted True
 ```
 
 
@@ -82,9 +83,11 @@ python split_set.py --dataset ml  --k_core_filtering_user 10 --k_core_filtering_
 ```
 
 ### MLHD
-python filter_year.py --chunksize 10000000 --start_date 2013-06-01 --end_date 2013-10-30
+```
+python filter_year.py --chunksize 10000000 --start_date 2009-06-01 --end_date 2009-10-30
 
-python split_set.py --dataset mlhd --year 2013 -remove_missing_profiles --k_core_filtering_user 5 --k_core_filtering_item 10 --validation_start 2013-09-01 --test_start 2013-10-01 --min_playcount 2 -binarize
+python split_set.py --dataset mlhd --year 2009 -remove_missing_profiles --k_core_filtering_user 5 --k_core_filtering_item 10 --validation_start 2009-09-01 --test_start 2009-10-01 --min_playcount 2 -binarize -sample_users --sample_size 13000
+```
 
 ### Hyperparameter Tuning
 - Install Elliot

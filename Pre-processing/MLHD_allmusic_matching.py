@@ -27,7 +27,7 @@ with open('AM_genres.txt', 'r') as f:
         am_genres.append(line.strip())
         
 
-with open('../utils/genres.txt', 'w') as f:
+with open('../utils/MLHD_genres.txt', 'w') as f:
     for genre in am_genres:
         f.write(genre + '\n')
 

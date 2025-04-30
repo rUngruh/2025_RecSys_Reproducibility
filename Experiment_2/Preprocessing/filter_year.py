@@ -69,7 +69,7 @@ del chunk
 
 print('Now loading all data to check for duplicates...')
 # Check whether duplicates remain
-interactions = pd.read_csv(save_path, sep='\t', compression='bz2')
+interactions = pd.read_csv(save_path, sep='\t', compression='bz2', header=None)
 interactions.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen', 'count']
 
 

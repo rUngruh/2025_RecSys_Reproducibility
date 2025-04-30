@@ -16,6 +16,8 @@ parser.add_argument('--validation_split_size', type=float, help='Validation spli
 parser.add_argument('--min_playcount', type=int, help='Minimum number of playcounts of user of a certain item.', default=1)
 parser.add_argument('--min_rating', type=int, help='Minimum rating per item', default=0)
 parser.add_argument('-binarize', action='store_true', help='Binarize the ratings')
+parser.add_argument('-sample_users', action='store_true', help='Sample users from the dataset')
+parser.add_argument('--sample_size', type=int, help='Number of users to sample', default=10000)
 args = parser.parse_args()
 
 # Use the dataset argument
@@ -25,6 +27,9 @@ remove_missing_profiles = args.remove_missing_profiles
 k_core_filtering_user = args.k_core_filtering_user
 k_core_filtering_item = args.k_core_filtering_item
 binarize = args.binarize
+sample_users = args.sample_users
+sample_size = args.sample_size
+
 
 if dataset == 'mlhd': # or dataset == 'ml':
     validation_start = pd.to_datetime(args.validation_start)
@@ -51,13 +56,19 @@ dataset_dir = os.getenv("dataset_directory")
 if dataset == 'mlhd':
     data_dir = dataset_dir + f'/processed/mlhd_rec_{year}'
     save_path = dataset_dir + f'/processed/mlhd_rec{"_filtered" if k_core_filtering_user else ""}'
+    user_stats_path = dataset_dir + f'/processed/mlhd_sampled_filtered'
+
 elif dataset == 'bx':
     data_dir = dataset_dir + '/processed/Book-Crossing'
     save_path = dataset_dir + f'/processed/bx_rec{"_filtered" if k_core_filtering_user else ""}'
+    user_stats_path = dataset_dir + f'/processed/Book-Crossing'
 elif dataset == 'ml':
     data_dir = dataset_dir + '/processed/movielens-1m'
     save_path = dataset_dir + f'/processed/ml_rec{"_filtered" if k_core_filtering_user else ""}'
+    user_stats_path = dataset_dir + f'/processed/movielens-1m'
 
+
+        
 train_path = save_path + f'/train.tsv'
 validation_path = save_path + f'/validation.tsv'
 test_path = save_path + f'/test.tsv'
@@ -91,21 +102,29 @@ if os.path.exists(validation_child_path):
 if os.path.exists(test_child_path):
     os.remove(test_child_path)
     
-interactions = pd.read_csv(interactions_path, sep='\t', compression='bz2')
+interactions = pd.read_csv(interactions_path, sep='\t', compression='bz2', header=None)
+if dataset == 'mlhd':
+    interactions.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen', 'count']
+if dataset == 'bx':
+    interactions.columns = ['user_id', 'item_id', 'rating']
+if dataset == 'ml':
+    interactions.columns = ['user_id', 'item_id', 'rating', 'timestamp']
+
+
+    
 
 
 
 if dataset == 'mlhd':
-    interactions.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen', 'count']
     print(interactions.head(n=5))
     interactions['timestamp'] = pd.to_datetime(interactions['timestamp'])
     interactions = interactions.sort_values(by=['user_id', 'timestamp'])
     interactions['rating'] = interactions['count']
-    user_info = interactions[['user_id', 'age_at_listen']].drop_duplicates()
+    user_info = interactions[['user_id', 'age_at_listen']].drop_duplicates().rename(columns={'age_at_listen': 'age'})
     
+    interactions = interactions.drop_duplicates(subset=['user_id', 'item_id'], keep='first')
     
 elif dataset == 'bx':
-    interactions.columns = ['user_id', 'item_id', 'rating']
     interactions.sort_values(['user_id', 'item_id', 'rating'], inplace=True)
     
     
@@ -114,23 +133,50 @@ elif dataset == 'bx':
     user_info = users[['user_id', 'age']]
     del users
     if min_playcount > 1:
-        interactions['count'] = interactions.groupby(['user_id', 'item_id']).transform('count')
+        interactions['count'] = interactions.groupby(['user_id', 'item_id'])['rating'].transform('count')
         
-    interactions.drop_duplicates(subset=['user_id', 'item_id'], keep='first')
+    interactions = interactions.drop_duplicates(subset=['user_id', 'item_id'], keep='first')
         
 elif dataset == 'ml':
-    interactions.columns = ['user_id', 'item_id', 'rating', 'timestamp']
     interactions['timestamp'] = pd.to_datetime(interactions['timestamp'], unit='s')
 
     interactions = interactions.sort_values(by=['user_id', 'timestamp'])
     
     users = pd.read_csv(data_dir + '/users.tsv', sep='\t')
+    
     user_info = users[['user_id', 'age']]
     
     if min_playcount > 1:
-        interactions['count'] = interactions.groupby(['user_id', 'item_id']).transform('count')
+        interactions['count'] = interactions.groupby(['user_id', 'item_id'])['rating'].transform('count')
     
-    interactions.drop_duplicates(subset=['user_id', 'item_id'], keep='first')
+    interactions = interactions.drop_duplicates(subset=['user_id', 'item_id'], keep='first')
+    
+if sample_users:
+    weighted = True # In our experiments, we always use weighted sampling
+    #user_stats = pd.read_csv(user_stats_path + f'/user_profile_stats{"_weighted" if weighted else ""}.tsv', sep='\t')
+    # age_distribution = user_stats['age'].value_counts(normalize=True).sort_index()
+    # del user_stats
+    user_with_sufficient_interactions = interactions.groupby('user_id').filter(lambda x: len(x) >= k_core_filtering_user)['user_id'].unique()
+    
+    user_info = user_info[user_info['user_id'].isin(user_with_sufficient_interactions)]
+    user_info = user_info.groupby('age', group_keys=False).apply(lambda x: x.sample(frac=sample_size/len(user_info), random_state=42)) 
+    
+    print(f"User age information")
+    print(user_info['age'].value_counts(normalize=True).sort_index())
+    
+    sampled_users = set(user_info['user_id'].unique())
+    # all_users = user_info['user_id'].unique()
+    # sampled_users = set()
+    # for age, prob in age_distribution.items():
+    #     available_users = user_info[user_info['age'] == age]['user_id']
+    #     n_sample = min(len(available_users), int(sample_size * prob))
+    #     if n_sample > 0:
+    #         age_users = available_users.sample(n=n_sample, random_state=42).tolist()
+    #         sampled_users.update(age_users)
+            
+    # user_info = user_info[user_info['user_id'].isin(sampled_users)]
+    interactions = interactions[interactions['user_id'].isin(sampled_users)]
+    print(f"Sampled {len(sampled_users)} users from the dataset")
     
         
 if min_playcount > 1:
@@ -151,8 +197,10 @@ if k_core_filtering_user:
     while nothing_removed == False:
         init_users = interactions['user_id'].nunique()
         init_items = interactions['item_id'].nunique()
+        init_interactions = interactions.shape[0]
         print(f"Initial number of users: {init_users}")
         print(f"Initial number of items: {init_items}")
+        print(f"Initial number of interactions: {init_interactions}")
         
         # Filter users and items that meet the k-core threshold
         user_profile_counts = interactions.groupby('user_id').size()
@@ -174,8 +222,10 @@ if k_core_filtering_user:
 
         final_users = interactions['user_id'].nunique()
         final_items = interactions['item_id'].nunique()
+        final_interactions = interactions.shape[0]
         print(f"Final number of users: {final_users}")
         print(f"Final number of items: {final_items}")
+        print(f"Final number of interactions: {final_interactions}")
         print()
         if final_users == init_users and final_items == init_items:
             nothing_removed = True

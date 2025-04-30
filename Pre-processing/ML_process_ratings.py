@@ -56,7 +56,7 @@ with open('../utils/ML_genres.txt', 'w') as f:
         f.write(genre + '\n')
 
 
-genre_subset.to_csv(genresSavePath, sep='\t', index=False, header=True, mode='w')
+
 
 print('Processing complete.')
 
@@ -78,6 +78,8 @@ ratings.rename(columns={'UserID': 'user_id',
                         'Rating': 'rating',
                         'Timestamp' : 'timestamp'}, inplace=True)
 
+genre_subset = genre_subset[genre_subset['item_id'].isin(ratings['item_id'])]
+genre_subset.to_csv(genresSavePath, sep='\t', index=False, header=True, mode='w')
 
 ratings.to_csv(ratingsSavePath, sep='\t', index=False, header=False, mode='w', compression='bz2' if ratingsSavePath.endswith('bz2') else None)
 
