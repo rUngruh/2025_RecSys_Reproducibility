@@ -185,13 +185,13 @@ def age_group(age):
 
         
 
-users.sort_values('age_at_listen', inplace=True)
-users['age_group'] = users['age_at_listen'].apply(age_group)
+users.sort_values('age_at_interaction', inplace=True)
+users['age_group'] = users['age_at_interaction'].apply(age_group)
 users = users.reset_index(drop=True)
 
 users['user_group'] = "mainstream"
-users.loc[users['age_at_listen'] < 17, 'user_group'] = "child"
-users.loc[users['age_at_listen'] > 29, 'user_group'] = "older"
+users.loc[users['age_at_interaction'] < 17, 'user_group'] = "child"
+users.loc[users['age_at_interaction'] > 29, 'user_group'] = "older"
 
 
 
@@ -265,7 +265,7 @@ for i, user in users.iterrows():
         users.at[i, f'{model}_recommendation_genre_distribution_50'] = transform_dict_to_genre_list(model_profiles_50[model][user_id])
         users.at[i, f'{model}_recommendation_genre_distribution_100'] = transform_dict_to_genre_list(model_profiles_100[model][user_id])
         users.at[i, f'{model}_recommendation_genre_distribution_200'] = transform_dict_to_genre_list(model_profiles_200[model][user_id])
-        if user['age_at_listen'] < 17:
+        if user['age_at_interaction'] < 17:
             users.at[i, f'child_{model}_recommendation_genre_distribution_5'] = transform_dict_to_genre_list(child_model_profiles_5[model][user_id])
             users.at[i, f'child_{model}_recommendation_genre_distribution_10'] = transform_dict_to_genre_list(child_model_profiles_10[model][user_id])
             users.at[i, f'child_{model}_recommendation_genre_distribution_20'] = transform_dict_to_genre_list(child_model_profiles_20[model][user_id])

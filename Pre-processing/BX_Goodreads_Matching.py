@@ -38,11 +38,12 @@ books['cluster'] = books['ISBN'].map(isbn_cluster_dict)
 cluster_genre_dict = {isbn_cluster_dict[isbn] : genre for isbn, genre in book_genre_dict.items() if isbn in isbn_cluster_dict.keys()}
 
 books['genres'] = books['cluster'].map(cluster_genre_dict)
-
+print(books['genres'])
 genres = set()
 for genre_list in books['genres']:
-    if isinstance(genre_list, str):
-        genres.update(genre_list.split(','))
+    if isinstance(genre_list, list):
+        genres.update(genre_list)
+
 with open('../utils/BX_genres.txt', 'w') as f:
     for genre in genres:
         f.write(genre + '\n')

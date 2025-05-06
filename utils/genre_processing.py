@@ -2,29 +2,32 @@ ML_genres = []
 MLHD_genres = []
 BX_genres = []
 
+import os
+this_file_path = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(this_file_path)
 
-with open('ML_genres.txt', 'r') as f:
+with open(f'{this_file_path}/ML_genres.txt', 'r') as f:
     for line in f:
         ML_genres.append(line.strip())
 
 
-with open('MLHD_genres.txt', 'r') as f:
+with open(f'{this_file_path}/MLHD_genres.txt', 'r') as f:
     for line in f:
         MLHD_genres.append(line.strip())
 
 
-with open('BX_genres.txt', 'r') as f:
+with open(f'{this_file_path}/BX_genres.txt', 'r') as f:
     for line in f:
         BX_genres.append(line.strip())
         
         
 def genre_dict_to_list(genre_dict, dataset):
     if dataset == 'ml':
-        return [genre_dict[genre] for genre in ML_genres]
+        return [genre_dict.get(genre, 0) for genre in ML_genres]
     elif dataset == 'mlhd':
-        return [genre_dict[genre] for genre in MLHD_genres]
+        return [genre_dict.get(genre, 0) for genre in MLHD_genres]
     elif dataset == 'bx':
-        return [genre_dict[genre] for genre in BX_genres]
+        return [genre_dict.get(genre, 0) for genre in BX_genres]
     else:
         return None
     

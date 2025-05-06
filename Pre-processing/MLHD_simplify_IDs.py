@@ -95,7 +95,7 @@ for le_path, save_path in zip(listening_events_paths, listening_events_save_path
     print("Read chunk")
     
     # Process listening events
-    chunk.columns = ['user_id', 'timestamp', 'artist_id', 'item_id', 'age_at_listen']
+    chunk.columns = ['user_id', 'timestamp', 'artist_id', 'item_id', 'age_at_interaction']
     
     chunk['user_id'] = chunk['user_id'].map(user_MBID_ID_dict).astype(np.int32)
 
@@ -140,5 +140,5 @@ if os.path.exists(all_listening_events_save_path):
 for le_path in listening_events_save_paths:
     print(f"Processing dataset {le_path}...")
     chunk = pd.read_csv(le_path, sep="\t", compression='bz2' if compressed else None, header=None)
-    chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen']
+    chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_interaction']
     chunk.to_csv(all_listening_events_save_path, sep="\t", index=False, header=False, mode='a', compression='bz2' if compressed else None)

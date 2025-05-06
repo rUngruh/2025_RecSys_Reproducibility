@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import argparse
 
+import utils.age_processing as ap
+
 from dotenv import load_dotenv
 from pathlib import Path
 env_path = Path('..') / 'config.env'
@@ -31,7 +33,7 @@ if dataset == 'mlhd':
     interactions_path = mlhd_data_dir + '/interactions.tsv.bz2'
     artist_path = mlhd_data_dir + '/artists.tsv'
     tracks_path = mlhd_data_dir + '/tracks.tsv'
-    # user_path = mlhd_data_dir + '/users.tsv' # Not needed since column 'age_at_listen' exists
+    # user_path = mlhd_data_dir + '/users.tsv' # Not needed since column 'age_at_interaction' exists
     
     compressed = True if interactions_path.endswith('.bz2') else False
     
@@ -42,6 +44,8 @@ if dataset == 'mlhd':
     
     item_artists = pd.read_csv(tracks_path, sep='\t')
     item_artist_dict = item_artists.set_index('item_id')['artist_id'].to_dict()
+    
+    popularity_path = mlhd_data_dir + '/item_popularity.csv'
     
 
 if dataset == 'bx':
@@ -60,6 +64,8 @@ if dataset == 'bx':
     
     compressed = True if interactions_path.endswith('.bz2') else False
     
+    popularity_path = bx_data_dir + '/item_popularity.csv'
+    
 if dataset == 'ml':
     user_profile_stats_path = ml_data_dir + '/user_profile_stats.tsv' if not weighted else ml_data_dir + '/user_profile_stats_weighted.tsv'
     interactions_path = ml_data_dir + '/interactions.tsv.bz2'
@@ -74,6 +80,8 @@ if dataset == 'ml':
     user_age_dict = dict(zip(users['user_id'], users['age']))
     
     compressed = True if interactions_path.endswith('.bz2') else False
+    
+    popularity_path = ml_data_dir + '/item_popularity.csv'
     
     
     
@@ -95,7 +103,7 @@ if in_batches:
     interactions = 0
     for i, chunk in enumerate(pd.read_csv(interactions_path, sep='\t', compression='bz2' if compressed else None, chunksize=chunksize, header=None)):
         if dataset == 'mlhd':
-            chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen']
+            chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_interaction']
         if dataset == 'bx':
             chunk.columns = ['user_id', 'item_id', 'rating']
             
@@ -106,19 +114,19 @@ if in_batches:
             print(f"Processing batch {i}, current batch size: {chunksize}") #; out of x billion, percentage: {(i * chunksize / x) * 100:.3f}%")
         
         if dataset == 'bx' or dataset == 'ml':
-            chunk['age_at_listen'] = chunk['user_id'].map(user_age_dict)
+            chunk['age_at_interaction'] = chunk['user_id'].map(user_age_dict)
             
             
         if weighted:
             chunk_user_interactions_dict = (chunk.copy()
-            .groupby(['user_id', 'age_at_listen'])
+            .groupby(['user_id', 'age_at_interaction'])
             .apply(lambda df: list(df['item_id']))
             .to_dict()
         )
         
         else:
             chunk_user_interactions_dict = (chunk.copy()
-                .groupby(['user_id', 'age_at_listen'])
+                .groupby(['user_id', 'age_at_interaction'])
                 .apply(lambda df: list(set(df['item_id'])))
                 .to_dict()
             )
@@ -167,7 +175,23 @@ if in_batches:
                         user_genre_sums[key][genre] += 1 / len(genres)
                     else:
                         user_genre_sums[key][genre] = 1 / len(genres)
-                        
+    
+    avg_popularity = {}
+    avg_normalized_popularity = {}
+    avg_age_group_popularity = {}
+    avg_normalized_age_group_popularity = {}
+    
+    item_popularities = pd.read_csv(popularity_path, sep='\t')
+    
+    
+    # Popularity Extension
+    for key, items in user_items.items():
+        age_group = ap.age_group(key[1], dataset, 'defined_ages')
+        avg_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)]['popularity'].mean()
+        avg_normalized_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)]['popularity_norm'].mean()
+        avg_age_group_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)][f'popularity_{age_group}'].mean()
+        avg_normalized_age_group_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)][f'popularity_{age_group}_norm'].mean()
+
     normalized_genre_sums = {}
         
     print(f"Processed {interactions} interactions.")
@@ -189,7 +213,11 @@ if in_batches:
                 'age': key[1],
                 'num_interactions': interactions_per_user[key],
                 'num_unique_items': unique_items_per_user[key],
-                'normalized_genre_distribution': user_genre_distribution                
+                'normalized_genre_distribution': user_genre_distribution,
+                'avg_popularity': avg_popularity[key],
+                'avg_normalized_popularity': avg_normalized_popularity[key],
+                'avg_age_group_popularity': avg_age_group_popularity[key],
+                'avg_normalized_age_group_popularity': avg_normalized_age_group_popularity[key]                
             })
 
 
@@ -207,11 +235,18 @@ else: # if not in_batches:
     
     unique_items_per_user = {}
     interactions_per_user = {}
+    
+    avg_popularity = {}
+    avg_normalized_popularity = {}
+    avg_age_group_popularity = {}
+    avg_normalized_age_group_popularity = {}
+    
+    item_popularities = pd.read_csv(popularity_path, sep='\t')
 
     chunk = pd.read_csv(interactions_path, sep='\t', compression='bz2' if compressed else None)
     
     if dataset == 'mlhd':
-        chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen']
+        chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_interaction']
     if dataset == 'bx':
         chunk.columns = ['user_id', 'item_id', 'rating']
     if dataset == 'ml':
@@ -219,18 +254,18 @@ else: # if not in_batches:
     interactions = len(chunk)
 
     if dataset == 'bx' or dataset == 'ml':
-        chunk['age_at_listen'] = chunk['user_id'].map(user_age_dict)
+        chunk['age_at_interaction'] = chunk['user_id'].map(user_age_dict)
         
     if weighted:
         chunk_user_interactions_dict = (chunk
-        .groupby(['user_id', 'age_at_listen'])
+        .groupby(['user_id', 'age_at_interaction'])
         .apply(lambda df: list(df['item_id']))
         .to_dict()
     )
     
     else:
         chunk_user_interactions_dict = (chunk
-            .groupby(['user_id', 'age_at_listen'])
+            .groupby(['user_id', 'age_at_interaction'])
             .apply(lambda df: list(set(df['item_id'])))
             .to_dict()
         )
@@ -248,7 +283,8 @@ else: # if not in_batches:
         
         if not weighted:
             new_items = new_unique_items # only add new unique items to genre computation
-                
+        
+        
         for item_id in new_items:
             if dataset == 'mlhd':
                 genre_item_id = item_artist_dict.get(item_id, None)
@@ -267,6 +303,17 @@ else: # if not in_batches:
         current_user_genres = user_genre_sums.get(key, {})
         total_value = sum(current_user_genres.values())
         user_genre_sums[key] = {genre: value / total_value for genre, value in current_user_genres.items()}
+        
+        age_group = ap.age_group(key[1], dataset, 'defined_ages')
+        avg_popularity[key] = item_popularities[item_popularities['item_id'].isin(new_unique_items)]['popularity'].mean()
+        avg_normalized_popularity[key] = item_popularities[item_popularities['item_id'].isin(new_unique_items)]['popularity_norm'].mean()
+        avg_age_group_popularity[key] = item_popularities[item_popularities['item_id'].isin(new_unique_items)][f'popularity_{age_group}'].mean()
+        avg_normalized_age_group_popularity[key] = item_popularities[item_popularities['item_id'].isin(new_unique_items)][f'popularity_{age_group}_norm'].mean()
+        
+        
+        
+        
+        
     
     print(f"Processed {interactions} interactions.")
 
@@ -280,16 +327,18 @@ else: # if not in_batches:
                 'age': key[1],
                 'num_interactions': interactions_per_user[key],
                 'num_unique_items': unique_items_per_user[key],
-                'normalized_genre_distribution': user_genre_distribution                
+                'normalized_genre_distribution': user_genre_distribution,
+                'avg_popularity': avg_popularity[key],
+                'avg_normalized_popularity': avg_normalized_popularity[key],
+                'avg_age_group_popularity': avg_age_group_popularity[key],
+                'avg_normalized_age_group_popularity': avg_normalized_age_group_popularity[key]                
             })
 
     print('Processing complete.')
-
     
 print('Saving user profiles...')
 if os.path.exists(user_profile_stats_path):
     os.remove(user_profile_stats_path)
-    
 
 
 stats_profile = pd.DataFrame(stats_profile_data)

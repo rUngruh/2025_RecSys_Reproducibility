@@ -1,0 +1,8 @@
+comics_graphic
+fantasy_paranormal
+romance
+history_biography
+young_adult
+poetry
+mystery_thriller_crime
+children

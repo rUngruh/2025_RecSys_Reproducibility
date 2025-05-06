@@ -43,7 +43,7 @@ if os.path.exists(save_path):
 print(f"Loading interactions from {interactions_path}...")
 num_unique_les = 0
 for i, chunk in enumerate(pd.read_csv(interactions_path, sep='\t', chunksize=chunksize, compression='bz2' if compressed else None, header=None)):
-    chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen']
+    chunk.columns = ['user_id', 'timestamp', 'item_id', 'age_at_interaction']
     if i % 1 == 0:  # Print status every 10 chunks
         print(f'Processed {i * chunksize:,} rows; current chunk size: {len(chunk):,}') #out of x billion ({i * chunksize / x:.2%})')
 
@@ -70,16 +70,16 @@ del chunk
 print('Now loading all data to check for duplicates...')
 # Check whether duplicates remain
 interactions = pd.read_csv(save_path, sep='\t', compression='bz2', header=None)
-interactions.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen', 'count']
+interactions.columns = ['user_id', 'timestamp', 'item_id', 'age_at_interaction', 'count']
 
 
 interactions = interactions.groupby(['user_id', 'item_id'], as_index=False).agg({
     'timestamp': 'min', 
-    'age_at_listen': 'first',  # shouldn't matter either as timeframe should be within the same age bracket
+    'age_at_interaction': 'first',  # shouldn't matter either as timeframe should be within the same age bracket
     'count': 'sum'
 })
 interactions.reset_index(drop=True, inplace=True)
 
-interactions = interactions[['user_id', 'timestamp', 'item_id', 'age_at_listen', 'count']]
+interactions = interactions[['user_id', 'timestamp', 'item_id', 'age_at_interaction', 'count']]
 
 interactions.to_csv(save_path, sep='\t', index=False, header=False)

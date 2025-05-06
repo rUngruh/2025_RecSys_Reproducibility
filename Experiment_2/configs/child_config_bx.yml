@@ -11,7 +11,7 @@ experiment:
   evaluation:
     cutoffs: [10,50]
     simple_metrics: [nDCG, Recall, MAP, MRR]
-  gpu: 2
+  gpu: 1
   path_output_rec_result: ./results/bx_child/recommendations
   path_output_rec_performance: ./results/bx_child/performance
   path_output_rec_weight: ./results/bx_child/weights

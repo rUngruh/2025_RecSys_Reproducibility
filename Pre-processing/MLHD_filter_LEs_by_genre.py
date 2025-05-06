@@ -90,12 +90,12 @@ for path, save_path in zip(les_paths, le_save_paths):
         if chunk.empty:
             continue
         data_collection_date = pd.to_datetime('2014-01-01') # This is the age returned by user_age_dict and the day a user turned the given age. chunk['timestamp'] is the time of listen.
-        #chunk['age_at_listen'] = user_age_dict.get(chunk['user_id'], np.nan) - 
+        #chunk['age_at_interaction'] = user_age_dict.get(chunk['user_id'], np.nan) - 
         
-        chunk.loc[:, 'age_at_listen'] = chunk['timestamp'].map(lambda date: custom_year_diff(date, data_collection_date)) + \
+        chunk.loc[:, 'age_at_interaction'] = chunk['timestamp'].map(lambda date: custom_year_diff(date, data_collection_date)) + \
             chunk['user_id'].map(user_age_dict)
             
-        chunk = chunk[chunk['age_at_listen'].notna()]
+        chunk = chunk[chunk['age_at_interaction'].notna()]
         
         seen_users.update(chunk['user_id'].unique())
         

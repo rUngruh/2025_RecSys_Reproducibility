@@ -1,5 +1,7 @@
 #
 
+As this work replicates the work by (Ungruh et al.)[], a lot of the code is based on their Code presented in their (repository)[]. 
+
 ## Set up environment
 ```
 conda install -n 2025_RecSys_repro PYTHON=3.12
@@ -38,6 +40,10 @@ Add the path of `data` to `config.env`.
 
 
 ## Data Preprocessing
+```
+cd Pre-Processing
+```
+
 ### MLHD+
 - For initial insights regarding age distribution etc, run the script `MLHD_testing.ipynb`
 - Run `MLHD_sampling.py`
@@ -61,6 +67,18 @@ We utilize the [Book-Data](https://bookdata.piret.info/) tool to extract isbn's 
 - Run `ML_process_ratings.py`
 
 ## Experiment 1
+```
+cd Experiment_1
+```
+
+### Popularity Extensions
+To prepare information about popularity of songs analyzed for the extension of the first experiment, run the following scripts
+```
+python compute_item_popularity --dataset ml
+python compute_item_popularity --dataset bx
+python compute_item_popularity --dataset mlhd
+```
+
 
 ### Book Crossing
 ```
@@ -106,5 +124,10 @@ pip install protobuf==3.20.3
 - Run Elliot
 ```
 python start_experiments.py --config all_user_config_bx
+python start_experiments.py --config all_user_config_ml
+python start_experiments.py --config all_user_config_mlhd
+python start_experiments.py --config child_config_bx
+python start_experiments.py --config child_config_ml
+python start_experiments.py --config child_config_mlhd
 ```
 

@@ -104,7 +104,7 @@ if os.path.exists(test_child_path):
     
 interactions = pd.read_csv(interactions_path, sep='\t', compression='bz2', header=None)
 if dataset == 'mlhd':
-    interactions.columns = ['user_id', 'timestamp', 'item_id', 'age_at_listen', 'count']
+    interactions.columns = ['user_id', 'timestamp', 'item_id', 'age_at_interaction', 'count']
 if dataset == 'bx':
     interactions.columns = ['user_id', 'item_id', 'rating']
 if dataset == 'ml':
@@ -120,7 +120,7 @@ if dataset == 'mlhd':
     interactions['timestamp'] = pd.to_datetime(interactions['timestamp'])
     interactions = interactions.sort_values(by=['user_id', 'timestamp'])
     interactions['rating'] = interactions['count']
-    user_info = interactions[['user_id', 'age_at_listen']].drop_duplicates().rename(columns={'age_at_listen': 'age'})
+    user_info = interactions[['user_id', 'age_at_interaction']].drop_duplicates().rename(columns={'age_at_interaction': 'age'})
     
     interactions = interactions.drop_duplicates(subset=['user_id', 'item_id'], keep='first')
     
@@ -232,7 +232,7 @@ if k_core_filtering_user:
     print("Finished k-core filtering")
 
 if dataset == 'mlhd':
-    child_chunk = interactions[interactions['age_at_listen'] < 18]
+    child_chunk = interactions[interactions['age_at_interaction'] < 17]
     child_chunk = child_chunk[['user_id', 'item_id', 'rating', 'timestamp']]
     interactions = interactions[['user_id', 'item_id', 'rating', 'timestamp']]
     print("Finished further processing")

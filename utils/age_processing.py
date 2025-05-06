@@ -6,23 +6,28 @@ def get_sorted_ages(dataset, age_type):
         elif age_type == 'binary_age':
             ages_sort = ['12-17', '18-65']
         elif age_type == 'finegrained_child_ages':
-            ages_sort = ['12', '13', '14', '15', '16', '17', '18-65'] 
+            ages_sort = ['12', '13', '14', '15', '16', '17', '18-49', '50-65'] 
         elif age_type == 'all_ages':
             ages_sort = [str(i) for i in range(12, 66)]  # All ages from 12 to 65
+        elif age_type == 'even_age_groups':
+            if dataset == 'mlhd':
+                ages_sort = ['12-16', '17-20', '21-24', '25-29', '30-34', '35-44', '45-54', '55-65']
+            elif dataset == 'bx':
+                ages_sort = ['12-17', '18-20', '21-24', '25-34', '35-44', '45-54', '55-65']        
         elif age_type == 'defined_ages':
             if dataset == 'mlhd':
                 ages_sort = ['12-16', '17-29', '30-65']
             elif dataset == 'bx':
                 ages_sort = ['12-17', '18-49', '50-65']
     elif dataset == 'ml':
-        if age_type == 'finegrained_age' or age_type == 'all_ages':
+        if age_type == 'finegrained_age' or age_type == 'all_ages' or age_type == 'even_age_groups':
             ages_sort = ['Under 18', '18-24', '25-34', '35-44', '45-49', '50-55', '56+']
         elif age_type == 'binary_age':
             ages_sort = ['Under 18', '18+']
         elif age_type == 'finegrained_child_ages':
-            ages_sort = ['Under 18', '18-65']
+            ages_sort = ['Under 18', '18+']
         elif age_type == 'defined_ages':
-            ages_sort = ['Under 18', '18-49', '50-65']
+            ages_sort = ['Under 18', '18-49', '50+']
     return ages_sort
 
 # Define the age grouping function
