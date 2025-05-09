@@ -153,3 +153,9 @@ Process_Results.py --dataset mlhd --age_type defined_ages -filtered
 --models "Random" "MostPop" "RP3beta" "iALS"
 --child_models "Random" "MostPop" "RP3beta" "iALS"
 ```
+
+## Gather Results
+- To gather results, adapt the second block of the following Jupyter Notebooks and run the tests/experiments.
+    - `Performance_Analysis.ipynb`
+    - `Miscalibration_Analysis.ipynb`
+    
