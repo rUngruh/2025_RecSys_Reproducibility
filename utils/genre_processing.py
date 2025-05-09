@@ -19,7 +19,16 @@ with open(f'{this_file_path}/MLHD_genres.txt', 'r') as f:
 with open(f'{this_file_path}/BX_genres.txt', 'r') as f:
     for line in f:
         BX_genres.append(line.strip())
-        
+       
+def get_genres(dataset):
+    if dataset == 'ml':
+        return ML_genres
+    elif dataset == 'mlhd':
+        return MLHD_genres
+    elif dataset == 'bx':
+        return BX_genres
+    else:
+        raise ValueError("Invalid dataset. Choose from 'ml', 'mlhd', or 'bx'.") 
         
 def genre_dict_to_list(genre_dict, dataset):
     if dataset == 'ml':

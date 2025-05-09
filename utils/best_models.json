@@ -1,0 +1,44 @@
+{
+    "ml": {
+        "all": [
+            "Random_seed=42",
+            "MostPop",
+            "RP3beta_neighborhood=496_alpha=0$44477903655656115_beta=0$5968193614337285_normalize_similarity=True",
+            "iALS_seed=42_e=172_bs=-1_factors=28_alpha=38$8296478778826_epsilon=8$534863014097178_reg=0$0036500204772274025_scaling=log_it=70"
+        ],
+        "child": [
+            "Random_seed=42",
+            "MostPop",
+            "RP3beta_neighborhood=803_alpha=0$45173389278169385_beta=0$18291155770623035_normalize_similarity=True",
+            "iALS_seed=42_e=172_bs=-1_factors=28_alpha=38$8296478778826_epsilon=8$534863014097178_reg=0$0036500204772274025_scaling=log_it=10"
+        ]
+    },
+    "bx": {
+        "all": [
+            "Random_seed=42",
+            "MostPop",
+            "RP3beta_neighborhood=803_alpha=0$45173389278169385_beta=0$18291155770623035_normalize_similarity=True",
+            "iALS_seed=42_e=48_bs=-1_factors=183_alpha=5$782209857295674_epsilon=0$12072642812774916_reg=0$006995693394401242_scaling=log_it=30"
+        ],
+        "child": [
+            "Random_seed=42",
+            "MostPop",
+            "RP3beta_neighborhood=97_alpha=0$7560956761393509_beta=0$33526461259666007_normalize_similarity=False",
+            "iALS_seed=42_e=172_bs=-1_factors=28_alpha=38$8296478778826_epsilon=8$534863014097178_reg=0$0036500204772274025_scaling=log_it=50"
+        ]
+    },
+    "mlhd": {
+        "all": [
+            "Random_seed=42",
+            "MostPop",
+            "RP3beta_neighborhood=803_alpha=0$45173389278169385_beta=0$18291155770623035_normalize_similarity=True",
+            "iALS_seed=42_e=63_bs=-1_factors=128_alpha=34$79687218602585_epsilon=0$8749995315533359_reg=0$0023352574146813763_scaling=log_it=20"
+        ],
+        "child": [
+            "Random_seed=42",
+            "MostPop",
+            "RP3beta_neighborhood=803_alpha=0$45173389278169385_beta=0$18291155770623035_normalize_similarity=True",
+            "iALS_seed=42_e=172_bs=-1_factors=28_alpha=38$8296478778826_epsilon=8$534863014097178_reg=0$0036500204772274025_scaling=log_it=10"
+        ]
+    }
+}

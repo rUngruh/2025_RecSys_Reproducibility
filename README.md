@@ -82,6 +82,7 @@ python compute_item_popularity --dataset mlhd
 
 ### Book Crossing
 ```
+python create_user_profiles_in_batches.py --dataset ml --weighted True
 python create_user_profiles_in_batches.py --dataset bx --weighted True
 python create_user_profiles_in_batches.py --dataset mlhd --weighted True
 ```
@@ -91,21 +92,17 @@ python create_user_profiles_in_batches.py --dataset mlhd --weighted True
 
 ### Book Crossing
 
+```
 python split_set.py --dataset bx --k_core_filtering_user 5 --k_core_filtering_item 5 --train_split_size 0.6 --validation_split_size 0.2 -binarize
-
-
-### MovieLens
-
-```
 python split_set.py --dataset ml  --k_core_filtering_user 10 --k_core_filtering_item 10 --train_split_size 0.6 --validation_split_size 0.2 --min_rating 4 -binarize
-```
 
-### MLHD
-```
+
 python filter_year.py --chunksize 10000000 --start_date 2009-06-01 --end_date 2009-10-30
-
 python split_set.py --dataset mlhd --year 2009 -remove_missing_profiles --k_core_filtering_user 5 --k_core_filtering_item 10 --validation_start 2009-09-01 --test_start 2009-10-01 --min_playcount 2 -binarize -sample_users --sample_size 13000
 ```
+
+
+
 
 ### Hyperparameter Tuning
 - Install Elliot
@@ -131,3 +128,28 @@ python start_experiments.py --config child_config_ml
 python start_experiments.py --config child_config_mlhd
 ```
 
+## Post-processing
+```
+cd Experiment_2/Preprocessing
+python compute_item_popularity.py --dataset ml
+python compute_item_popularity.py --dataset bx
+python compute_item_popularity.py --dataset mlhd
+```
+
+- For simplicity, add the identifying names of the best models in the `utils/best_models.json`.
+
+```
+cd Experiment_2/Result_Analysis
+Process_Results.py --dataset ml --age_type defined_ages -filtered --models "Random" "MostPop" "RP3beta" "iALS"
+--child_models "Random" "MostPop" "RP3beta" "iALS"
+
+cd Experiment_2/Result_Analysis
+Process_Results.py --dataset bx --age_type defined_ages -filtered 
+--models "Random" "MostPop" "RP3beta" "iALS"
+--child_models "Random" "MostPop" "RP3beta" "iALS"
+
+cd Experiment_2/Result_Analysis
+Process_Results.py --dataset mlhd --age_type defined_ages -filtered 
+--models "Random" "MostPop" "RP3beta" "iALS"
+--child_models "Random" "MostPop" "RP3beta" "iALS"
+```

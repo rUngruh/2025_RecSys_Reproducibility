@@ -175,7 +175,7 @@ if in_batches:
                         user_genre_sums[key][genre] += 1 / len(genres)
                     else:
                         user_genre_sums[key][genre] = 1 / len(genres)
-    
+    print(f"Processed {interactions} interactions.")
     avg_popularity = {}
     avg_normalized_popularity = {}
     avg_age_group_popularity = {}
@@ -183,14 +183,36 @@ if in_batches:
     
     item_popularities = pd.read_csv(popularity_path, sep='\t')
     
-    
+    item_popularity_dict = item_popularities.set_index('item_id').to_dict(orient='index')
+    del item_popularities
     # Popularity Extension
     for key, items in user_items.items():
         age_group = ap.age_group(key[1], dataset, 'defined_ages')
-        avg_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)]['popularity'].mean()
-        avg_normalized_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)]['popularity_norm'].mean()
-        avg_age_group_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)][f'popularity_{age_group}'].mean()
-        avg_normalized_age_group_popularity[key] = item_popularities[item_popularities['item_id'].isin(items)][f'popularity_{age_group}_norm'].mean()
+        
+        sum_popularity = 0
+        sum_normalized_popularity = 0
+        sum_age_group_popularity = 0
+        sum_normalized_age_group_popularity = 0
+        count = 0
+        
+        for item in items:
+            if item in item_popularity_dict:
+                item_data = item_popularity_dict[item]
+                sum_popularity += item_data['popularity']
+                sum_normalized_popularity += item_data['popularity_norm']
+                sum_age_group_popularity += item_data.get(f'popularity_{age_group}', 0)
+                sum_normalized_age_group_popularity += item_data.get(f'popularity_{age_group}_norm', 0)
+                count += 1
+        
+        # Compute averages if there are any valid items
+        if count > 0:
+            avg_popularity[key] = sum_popularity / count
+            avg_normalized_popularity[key] = sum_normalized_popularity / count
+            avg_age_group_popularity[key] = sum_age_group_popularity / count
+            avg_normalized_age_group_popularity[key] = sum_normalized_age_group_popularity / count
+        else:
+            # Handle case where no items are found
+            avg_popularity[key] = avg_normalized_popularity[key] = avg_age_group_popularity[key] = avg_normalized_age_group_popularity[key] = 0
 
     normalized_genre_sums = {}
         
@@ -199,9 +221,6 @@ if in_batches:
     for key, user_genres in user_genre_sums.items():
         total_value = sum(user_genres.values())
         normalized_genre_sums[key] = {genre: value / total_value for genre, value in user_genres.items()}
-
-
-
 
 
     print('Creating dataframes...')
@@ -261,7 +280,7 @@ else: # if not in_batches:
         .groupby(['user_id', 'age_at_interaction'])
         .apply(lambda df: list(df['item_id']))
         .to_dict()
-    )
+        )
     
     else:
         chunk_user_interactions_dict = (chunk
@@ -290,7 +309,14 @@ else: # if not in_batches:
                 genre_item_id = item_artist_dict.get(item_id, None)
             else:
                 genre_item_id = item_id
-            genres = genre_dict.get(genre_item_id, [])
+            if not isinstance(genre_item_id, int) and ',' in genre_item_id:
+                ids = genre_item_id.split(',')
+                ids = [id for id in ids]
+                genres = set()
+                for id in ids:
+                    genres.update(genre_dict.get(id, []))
+            else:
+                genres = genre_dict.get(genre_item_id, [])
         
             
             for genre in genres:

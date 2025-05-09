@@ -175,7 +175,7 @@ else:
         
     print('Creating DataFrame')
 
-    df_total = pd.DataFrame.from_dict(total_counts, orient='index', columns=['popularity']).reset_index().rename(columns={'index': 'item_id'}, inplace=True)
+    df_total = pd.DataFrame.from_dict(total_counts, orient='index', columns=['popularity']).reset_index().rename(columns={'index': 'item_id'})
 
 
     df_distinct = pd.DataFrame(distinct_users.items(), columns=['item_id', 'popularity_distinct'])
@@ -186,7 +186,7 @@ else:
     df_age.columns = ['item_id'] + [f'popularity_{col}' for col in df_age.columns if col != 'item_id']
 
     # Distinct users per item per age group
-    df_age_distinct = pd.DataFrame.from_dict({item: {age: len(users) for age, users in age_dict.items()}
+    df_age_distinct = pd.DataFrame.from_dict({item: {age: users for age, users in age_dict.items()}
                                             for item, age_dict in age_group_users.items()},
                                             orient='index').fillna(0).reset_index().rename(columns={'index': 'item_id'})
     df_age_distinct.columns = ['item_id'] + [f'popularity_distinct_{col}' for col in df_age_distinct.columns if col != 'item_id']
