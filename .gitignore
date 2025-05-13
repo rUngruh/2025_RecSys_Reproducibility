@@ -160,5 +160,5 @@ cython_debug/
 #.idea/
 
 /data
-/Results
+/Experiment_2/Results
 /Experiment_1/Results
