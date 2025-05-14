@@ -1,3 +1,10 @@
+######################################################################
+
+# This script creates a mapping of book ISBNs to their genres based on the Goodreads dataset.
+# The mapping is saved as a JSON file for further processing.
+
+######################################################################
+
 import os
 import gzip
 import json

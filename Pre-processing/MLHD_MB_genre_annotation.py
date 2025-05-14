@@ -1,3 +1,11 @@
+######################################################################
+
+# This script gathers the genres of artists from the MusicBrainz API.
+# It takes a list of artist IDs from a TSV file and fetches their genres in batches.
+# Make sure to set the environment variables for your MusicBrainz app name and email in a config.env file.
+
+######################################################################
+
 import pandas as pd
 import requests
 import time
@@ -5,7 +13,7 @@ from tqdm import tqdm
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-import sys
+
 
 env_path = Path('..') / 'config.env'
 load_dotenv(dotenv_path=env_path)

@@ -1,3 +1,12 @@
+######################################################################
+
+# As the MLHD dataset provides verbose MusicBrainz IDs, this script simplifies the IDs to integers.
+# The script processes the artists and users, and then combines all listening events into a single file.
+# The script also creates dictionaries to map the original IDs to the new simplified IDs for artists, users, and items.
+
+######################################################################
+
+
 import os
 import pandas as pd
 import numpy as np

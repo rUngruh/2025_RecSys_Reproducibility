@@ -60,6 +60,7 @@ Navigate to the Pre-processing directory: `cd Pre-Processing`
 
 ### MLHD+
 - For initial insights regarding age distribution etc, run the script `MLHD_testing.ipynb`.
+- For Genre gathering from the MusicBrainz API, set the environment variables for the MusicBrainz app name and email in the `config.env` file.
 - Then, the following scripts are used to sample the data, gather genres from the MusicBrainz API, and create the files required for the experiments:
 
 ```
@@ -133,8 +134,7 @@ python compute_item_popularity --dataset bx
 python compute_item_popularity --dataset mlhd
 ```
 
-
-### Book Crossing
+### User Profile Analysis
 ```
 python create_user_profiles_in_batches.py --dataset ml --weighted True
 python create_user_profiles_in_batches.py --dataset bx --weighted True

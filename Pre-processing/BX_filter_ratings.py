@@ -1,3 +1,10 @@
+######################################################################
+
+# This script processes interactions from the Book-Crossing dataset.
+# It filters out items without genres and saves the files in a format consistent with other datasets used in the project.
+
+######################################################################
+
 import pandas as pd
 import os
 import pandas as pd

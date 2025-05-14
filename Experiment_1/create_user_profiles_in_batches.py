@@ -1,3 +1,11 @@
+
+######################################################################
+
+# This script creates user profiles in batches or all at once based on the specified dataset.
+# # It computes the genre distribution, average popularity, and other statistics for each user.
+
+######################################################################
+
 import os
 import pandas as pd
 import argparse

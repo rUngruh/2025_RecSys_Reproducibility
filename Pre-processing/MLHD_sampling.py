@@ -1,3 +1,13 @@
+######################################################################
+
+# This script samples users from the MLHD dataset based on the following criteria:
+# 1. Users must have a first scrobble date before the base date (2009-01-01) and a last scrobble date after the end date (2013-12-31).
+# 2. Users must be between the ages of 12 and 64 at the base date.
+# 3. Users must have a playcount within 2 standard deviations of the mean playcount.
+
+######################################################################
+
+
 import os
 import pandas as pd
 import matplotlib.pyplot as plt

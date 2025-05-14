@@ -1,3 +1,11 @@
+######################################################################
+
+# This script computes the popularity of items in the specified dataset.
+# This can be done in batches or all at once.
+# The popularity is computed based on the number of interactions and distinct users for each item.
+
+######################################################################
+
 import os
 import pandas as pd
 import argparse

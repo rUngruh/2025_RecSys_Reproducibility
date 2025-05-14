@@ -1,12 +1,15 @@
+######################################################################
+
+# This scripts takes the sampled users from the MLHD_sampling.py script and extracts their listening events from the MLHD dataset.
+
+######################################################################
+
+
 import os
 import pandas as pd
 import tarfile
 from dotenv import load_dotenv
 from pathlib import Path
-import sys
-import argparse
-import json
-import bz2
 import zstandard as zstd
 import io
 
@@ -18,7 +21,7 @@ dataset_dir = os.getenv("dataset_directory")
 mlhd_directory = dataset_dir + '/raw/MLHD+'
 sample_directory = dataset_dir + '/processed/MLHD_sampled'
 
-listening_events_path = os.path.join(sample_directory, 'listening_events.tsv')
+
 savestate_path = os.path.join(sample_directory, 'processing_savestate.txt')
 
 sampled_users = set(pd.read_csv(os.path.join(sample_directory, 'users.tsv'), sep="\t")['user_id'].unique())
@@ -84,7 +87,7 @@ def process_tar_file(tar_path, save_path):
                         log.write(member.name + '\n')
                 savestate_members = []
 
-                print(f'Saving {len(write_lines)} lines to {listening_events_path}...')
+                print(f'Saving {len(write_lines)} lines to {save_path}...')
                 if write_lines:
                     save_batch(write_lines, save_path, compressed=True)
                     write_lines = []
@@ -96,7 +99,7 @@ def process_tar_file(tar_path, save_path):
                 for member in savestate_members:
                     log.write(member.name + '\n')
                     
-        print(f'Saving {len(write_lines)} lines to {listening_events_path}...')
+        print(f'Saving {len(write_lines)} lines to {save_path}...')
         if write_lines:
             save_batch(write_lines, save_path, compressed=True)
             write_lines = []

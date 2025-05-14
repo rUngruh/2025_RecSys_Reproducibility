@@ -1,14 +1,14 @@
+######################################################################
+
+# This script takes the sampled listening events from the MLHD dataset and extracts the unique artists from them.
+
+######################################################################
+
 import os
 import pandas as pd
-import tarfile
+
 from dotenv import load_dotenv
 from pathlib import Path
-import sys
-import argparse
-import json
-import bz2
-import zstandard as zstd
-import io
 
 
 env_path = Path('..') / 'config.env'
@@ -18,7 +18,6 @@ dataset_dir = os.getenv("dataset_directory")
 
 sample_directory = dataset_dir + '/processed/MLHD_sampled'
 
-#listening_events_path = os.path.join(sample_directory, 'listening_events.tsv.bz2')
 
 artists_path = os.path.join(sample_directory, 'artists.tsv')
 
@@ -26,7 +25,6 @@ batch_size = 1000000
 artists = set()
 
 le_paths = [os.path.join(sample_directory, f'listening_events-{i}.tsv.bz2') for i in list(range(0, 10)) + list(map(chr, range(ord('a'), ord('f')+1)))]
-#le_paths = [os.path.join(sample_directory, f'listening_events-{i}.tsv.bz2') for i in list(range(0, 6)) ]
 
 
 for path in le_paths:

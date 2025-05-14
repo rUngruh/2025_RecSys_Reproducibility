@@ -1,3 +1,9 @@
+######################################################################
+
+# This script processes the MovieLens 1M dataset by filtering out items without genres and saving the processed data to a specified directory.
+# It saves the interactions, genres, and user information in separate TSV files in line with other datasets used in the project.
+
+######################################################################
 
 import sys
 import pandas as pd
@@ -28,9 +34,7 @@ print('Loading and processing batches...')
 delimiter = '::'
 compression= None
 
-
 genre_subset = pd.DataFrame()
-
 
 genre_subset = pd.read_csv(genres_path, delimiter=delimiter, header=None, encoding='latin-1')
 genre_subset.columns = ['ItemID', 'Title', 'Genres']
@@ -54,8 +58,6 @@ for genre_list in genre_subset['genres']:
 with open('../utils/ML_genres.txt', 'w') as f:
     for genre in genres:
         f.write(genre + '\n')
-
-
 
 
 print('Processing complete.')

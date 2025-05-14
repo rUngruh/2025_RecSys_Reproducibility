@@ -1,3 +1,10 @@
+######################################################################
+
+# This script annotates the genres of artists in the MLHD dataset with AllMusic genres.
+# The matching is done based on genres provided by the MusicBrainz API, which are then matched with AllMusic genres.
+
+######################################################################
+
 import os
 import pandas as pd
 import numpy as np
@@ -10,9 +17,6 @@ dataset_dir = os.getenv("dataset_directory")
 
 
 sample_directory = dataset_dir + '/processed/MLHD_sampled'
-
-
-#listening_events_path = os.path.join(sample_directory, 'listening_events.tsv.bz2')
 
 artists_MB_path = os.path.join(sample_directory, 'artist_MB_genres.tsv')
 artists_genres_path = os.path.join(sample_directory, 'artists_genres.tsv')

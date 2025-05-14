@@ -1,3 +1,11 @@
+######################################################################
+
+# This script matches the books in the Book-Crossing dataset with genres from Goodreads.
+# It requires the isbn-clusters.parquet file, which contains the mapping of ISBNs to clusters.
+# The isbn-clusters.parquet is generated with the bookdata tool as described in the README.
+
+######################################################################
+
 import pandas as pd
 import os
 import json
@@ -5,7 +13,7 @@ import json
 import os
 import pandas as pd
 import numpy as np
-import argparse
+
 
 from dotenv import load_dotenv
 from pathlib import Path

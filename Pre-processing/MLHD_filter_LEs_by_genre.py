@@ -1,3 +1,12 @@
+######################################################################
+
+# This script filters the listening events of users based on the genres of artists.
+# It retains only those listening events where the artist's genre is present in the provided list of genres.
+# The script also calculates the age of users at the time of interaction and saves the filtered data to a new file.
+# Further, only listening events within a specified date range are retained.
+
+######################################################################
+
 import os
 import pandas as pd
 import numpy as np
@@ -96,7 +105,6 @@ for path, save_path in zip(les_paths, le_save_paths):
         if chunk.empty:
             continue
         data_collection_date = pd.to_datetime('2014-01-01') # This is the age returned by user_age_dict and the day a user turned the given age. chunk['timestamp'] is the time of listen.
-        #chunk['age_at_interaction'] = user_age_dict.get(chunk['user_id'], np.nan) - 
         
         chunk.loc[:, 'age_at_interaction'] = chunk['timestamp'].map(lambda date: custom_year_diff(date, data_collection_date)) + \
             chunk['user_id'].map(user_age_dict)

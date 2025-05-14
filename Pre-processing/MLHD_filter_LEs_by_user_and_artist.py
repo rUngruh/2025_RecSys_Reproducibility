@@ -1,3 +1,12 @@
+######################################################################
+
+# This script samples the listening events from the MLHD dataset based on the sampled users and artists.
+# Make sure to add the sampled users and artists from the Samples directory to the data directory as specified in the README.
+# Running this script with the specified samples avoids the need to re-run the sampling and genre annotation process.
+
+######################################################################
+
+
 import os
 import pandas as pd
 import zstandard as zstd
