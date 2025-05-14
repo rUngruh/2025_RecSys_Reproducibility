@@ -1,3 +1,10 @@
+######################################################################
+
+# This script computes item popularity on the training set of the dataset.
+
+######################################################################
+
+
 import os
 import pandas as pd
 import argparse

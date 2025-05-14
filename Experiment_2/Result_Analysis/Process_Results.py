@@ -1,3 +1,14 @@
+######################################################################
+
+# This script gathers the results of the experiment and computes preference profiles for users.
+# It processes user and recommendation data, computes user profiles, and saves the results to a file.
+# It computes the genre distribution for each user based on their interactions and the recommendations they received.
+# It also computes the average popularity of items in the recommendations and saves the results to a file.
+# The script uses argparse to handle command-line arguments for dataset selection, model selection, and other parameters.
+
+######################################################################
+
+
 import os
 import ast
 import pandas as pd

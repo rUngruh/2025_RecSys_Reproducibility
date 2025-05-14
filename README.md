@@ -166,6 +166,8 @@ python filter_year.py --chunksize 10000000 --start_date 2009-06-01 --end_date 20
 python split_set.py --dataset mlhd --year 2009 -remove_missing_profiles --k_core_filtering_user 5 --k_core_filtering_item 10 --validation_start 2009-09-01 --test_start 2009-10-01 --min_playcount 2 -binarize -sample_users --sample_size 13000
 ```
 
+The filtered and split sets can be analyzed with `compare_user_stats_to_filtered_set.ipynb` and `analyze_experimental_set.ipynb` to test their viability and the split sizes.
+
 ### Install Elliot
 ```
 cd 2025_RecSys_Reproducibility

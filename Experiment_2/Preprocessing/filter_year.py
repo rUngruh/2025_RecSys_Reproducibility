@@ -1,5 +1,12 @@
+######################################################################
+
+# This script filters MLHD for a specific year and saves the filtered data.
+# It also removes duplicate listening events, keeping only the first one per user-track combination.
+# The script is designed to work with the MLHD dataset and requires the dataset directory to be specified in a .env file.
+
+######################################################################
+
 import os
-import ast
 import pandas as pd
 
 from dotenv import load_dotenv

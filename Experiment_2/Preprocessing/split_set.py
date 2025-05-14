@@ -1,5 +1,12 @@
+######################################################################
+
+# This scipt creates train, validation and test split, including k-core filtering and removal of invalid profiles.
+# It also creates a child dataset for child users.
+# The details can be specified in the command line arguments.
+
+######################################################################
+
 import os
-import ast
 import pandas as pd
 import argparse
 

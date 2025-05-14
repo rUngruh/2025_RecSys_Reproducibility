@@ -6,7 +6,7 @@ Here, we provide extended results to those obtained in our reproducibility study
 
 ### Metric Definition
 
-- **Mainstream Deviation** ($MD_{age}$) and **Child Deviation** $CD_{age}$) measures the average Jensen-Shannon Divergence between $UGPs$  belonging to an age group and the $AGP_{Mainstream}$ (the average $UGP$ across all mainstream profiles) or $AGP_{Child}$ (the average $UGP$ across all child profiles)
+- **Mainstream Deviation** ($MD_{age}$) and **Child Deviation** ($CD_{age}$) measures the average Jensen-Shannon Divergence between $UGPs$  belonging to an age group and the $AGP_{Mainstream}$ (the average $UGP$ across all mainstream profiles) or $AGP_{Child}$ (the average $UGP$ across all child profiles)
 
 ### Results
 
