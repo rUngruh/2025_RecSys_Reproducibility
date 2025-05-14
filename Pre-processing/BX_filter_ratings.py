@@ -1,15 +1,18 @@
 import pandas as pd
 import os
-import json
-import os
 import pandas as pd
-import numpy as np
 
 from dotenv import load_dotenv
 from pathlib import Path
 env_path = Path('..') / 'config.env'
 load_dotenv(dotenv_path=env_path)
 dataset_dir = os.getenv("dataset_directory")
+
+import argparse
+argparser = argparse.ArgumentParser(description="Process MLHD listening events.")
+argparser.add_argument('--dataset_dir', type=str, help="Path to the dataset directory. Only needed if not using the .env file.", default=dataset_dir)
+args = argparser.parse_args()
+dataset_dir = args.dataset_dir
 
 bx_directory = dataset_dir + '/raw/Book-Crossing'
 processed_directory = dataset_dir + '/processed/Book-Crossing'

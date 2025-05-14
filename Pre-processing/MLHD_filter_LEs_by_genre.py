@@ -9,6 +9,18 @@ env_path = Path('..') / 'config.env'
 load_dotenv(dotenv_path=env_path)
 dataset_dir = os.getenv("dataset_directory")
 
+parser = argparse.ArgumentParser(description='Filter listening events by genre')
+parser.add_argument('--start_date', type=str, default='2009-01-01', help='Start date for filtering (YYYY-MM-DD)')
+parser.add_argument('--end_date', type=str, default='2013-12-31', help='End date for filtering (YYYY-MM-DD)')
+parser.add_argument('--dataset_dir', type=str, help="Path to the dataset directory. Only needed if not using the .env file.", default=dataset_dir)
+
+args = parser.parse_args()
+
+start_date = pd.to_datetime(args.start_date)
+end_date = pd.to_datetime(args.end_date)
+dataset_dir = args.dataset_dir
+
+
 sample_directory = dataset_dir + '/processed/MLHD_sampled'
 sample_filtered_directory = dataset_dir + '/processed/MLHD_sampled_filtered'
 
@@ -20,13 +32,7 @@ users_path = os.path.join(sample_directory, 'users.tsv')
 users_save_path = os.path.join(sample_filtered_directory, 'users_verbose.tsv')
 
 le_save_paths = [os.path.join(sample_filtered_directory, f'interactions_verbose-{i}.tsv.bz2') for i in list(range(0, 10)) + list(map(chr, range(ord('a'), ord('f')+1)))]
-parser = argparse.ArgumentParser(description='Filter listening events by genre')
-parser.add_argument('--start_date', type=str, default='2009-01-01', help='Start date for filtering (YYYY-MM-DD)')
-parser.add_argument('--end_date', type=str, default='2013-12-31', help='End date for filtering (YYYY-MM-DD)')
 
-args = parser.parse_args()
-start_date = pd.to_datetime(args.start_date)
-end_date = pd.to_datetime(args.end_date)
 
 data_collection_date = pd.to_datetime('2014-01-01') # This date is the day we assume each user turned the reported age
 
@@ -108,6 +114,7 @@ for path, save_path in zip(les_paths, le_save_paths):
         
         chunk.to_csv(save_path, mode='a', sep='\t', index=False, header=False, compression='bz2' if compressed else None)
         print(f'Processed chunk {i} and saved to {save_path}')
+        
 if os.path.exists(users_save_path):
     os.remove(users_save_path)
 

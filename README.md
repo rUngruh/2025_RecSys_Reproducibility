@@ -18,7 +18,7 @@ pip install -e .
 ## Data gathering
 Gather all publicly available datasets and add the data to a directory `data`: [MLHD+](https://musicbrainz.org/doc/MLHD+) and the respective demographical data from the original [MLHD](https://ddmal.music.mcgill.ca/research/The_Music_Listening_Histories_Dataset_(MLHD)/), [Book-Crossing](https://www.kaggle.com/datasets/syedjaferk/book-crossing-dataset), [Goodreads](https://cseweb.ucsd.edu/~jmcauley/datasets/goodreads.html) subsets, [MovieLens-1m](https://grouplens.org/datasets/movielens/1m/). 
 
-We provide our user and item samples, so that the sampling and genre gathering steps for MLHD can be skipped and that experiments can be reproduce easily with our used samples. If these are used, add them to the data repository in the `processed/MLHD_sample` path.
+To ease reproducibility, we provide our user and item samples, so that the sampling and genre gathering steps for MLHD as well as genre gathering steps for Book-Crossing can be skipped. With this, our experiments can be reproduced easily with our used samples and the same data samples can be easily used for future studies. If these should be used, extract them from the `Samples` directory (or [download the MLHD samples](https://zenodo.org/records/15394228)) and place them at `processed/MLHD_processed` and `processed/Book-Crossing`.
 
 The data directory should look like this:
 ```
@@ -44,20 +44,24 @@ The data directory should look like this:
 │   │   │   ├── ratings.dat
 │   │   │   ├── users.dat
 │   ├── processed
-│   │   ├── MLHD_sample
+│   │   ├── MLHD_processed
 │   │   │   ├── artists.tsv
 │   │   │   ├── users.tsv
+│   │   ├── Book-Crossing
+│   │   │   ├── books_w_genre.tsv
 ├── ...
 ```
 Add the path of `data` to `config.env`.
 
 ## Data Preprocessing
+Here, we provide the required steps to process the data used for our experiments. In case you want to use the provided data samples, pay attention to the additional _notes_.
 
 Navigate to the Pre-processing directory: `cd Pre-Processing`
 
 ### MLHD+
 - For initial insights regarding age distribution etc, run the script `MLHD_testing.ipynb`.
-- Then, the following scripts are used to sample the data, gather genres from the MusicBrainz API, and create the files necessary for the experiments:
+- Then, the following scripts are used to sample the data, gather genres from the MusicBrainz API, and create the files required for the experiments:
+
 ```
 # Sampling
 MLHD_sampling.py
@@ -74,7 +78,18 @@ MLHD_filter_LEs_by_genre.py
 # Create a simplified version with custom IDs instead of MusicBrainz identifiers
 MLHD_simplify_IDs.py
 ```
+> **_NOTE:_**  In case, the published samples are used, the first steps can be skipped. Read below for more information
 
+#### Usage of MLHD user and artist samples
+When using the published samples, add them to the data directory as explained before and run the following script:
+
+```
+python MLHD_filter_LEs_by_user_and_artist.py -start_fresh -sample_les -save_users -save_artists
+```
+
+Afterward, the first five steps of the preprocessing can be skipped. Resume further processing with `MLHD_filter_LEs_by_genre.py`.
+
+In case, you don't want to use the `config.env` to set the dataset directory for these steps (e.g., if the data sample is used for another work), set the argument `--dataset_dir` for the scripts used to processes MLHD with the data sample.
 
 
 ### BookCrossing
@@ -88,6 +103,16 @@ BX_create_goodreads_genre_dict.py
 BX_Goodreads_Matching.py
 BX_filter_ratings.py
 ```
+
+> **_NOTE:_**  In case, the published genre samples are used, the first steps and usage of the bookdata tool can be skipped. Read below for more information
+#### Usage of BX book samples
+When using the published samples, the combination of BX with Goodreads is not necessary and the first steps of the processing can be skipped. 
+
+
+The first twp steps of the preprocessing can be skipped. Resume further processing with `BX_filter_ratings.py`.
+
+In case, you don't want to use the `config.env` to set the dataset directory for these steps (e.g., if the data sample is used for another work), set the argument `--dataset_dir` of `BX_filter_ratings.py`.
+
 
 ### MovieLens-1m
 To prepare the data for the experiments, run:
@@ -208,4 +233,3 @@ Process_Results.py --dataset mlhd --age_type defined_ages -filtered
     - `Mainstream_Child_AGP_Deviations.ipynb`
     - `Plot_AGPs.ipynb`
     - `Popularity_Analysis.ipynb`
-    

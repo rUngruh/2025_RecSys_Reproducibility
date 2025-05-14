@@ -1,11 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
-import argparse
-import json
-import time
 
-from pandas.errors import EmptyDataError, ParserError
+import json
 
 from dotenv import load_dotenv
 from pathlib import Path
@@ -13,12 +10,16 @@ env_path = Path('..') / 'config.env'
 load_dotenv(dotenv_path=env_path)
 dataset_dir = os.getenv("dataset_directory")
 
+import argparse
+argparser = argparse.ArgumentParser(description="Process MLHD listening events.")
+argparser.add_argument('--dataset_dir', type=str, help="Path to the dataset directory. Only needed if not using the .env file.", default=dataset_dir)
+args = argparser.parse_args()
+dataset_dir = args.dataset_dir
 
 sample_filtered_directory = dataset_dir + '/processed/MLHD_sampled_filtered'
 
 listening_events_paths = [os.path.join(sample_filtered_directory, f'interactions_verbose-{i}.tsv.bz2') for i in 
                           list(range(0, 10)) + list(map(chr, range(ord('a'), ord('f')+1)))]
-
 
 artists_path = os.path.join(sample_filtered_directory, 'artists_verbose.tsv')
 users_path = os.path.join(sample_filtered_directory, 'users_verbose.tsv')

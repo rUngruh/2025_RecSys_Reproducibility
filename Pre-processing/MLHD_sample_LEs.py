@@ -23,11 +23,9 @@ savestate_path = os.path.join(sample_directory, 'processing_savestate.txt')
 
 sampled_users = set(pd.read_csv(os.path.join(sample_directory, 'users.tsv'), sep="\t")['user_id'].unique())
 
-mlhd_datasets = [os.path.join(mlhd_directory, f'mlhdplus-complete-d.tar')]
-save_paths = [os.path.join(sample_directory, f'listening_events-d.tsv.bz2') ]
 
-# mlhd_datasets = [os.path.join(mlhd_directory, f'mlhdplus-complete-{i}.tar') for i in list(range(0, 10)) + list(map(chr, range(ord('a'), ord('f')+1)))]
-# save_paths = [os.path.join(sample_directory, f'listening_events-{i}.tsv.bz2') for i in list(range(0, 10)) + list(map(chr, range(ord('a'), ord('f')+1)))]
+mlhd_datasets = [os.path.join(mlhd_directory, f'mlhdplus-complete-{i}.tar') for i in list(range(0, 10)) + list(map(chr, range(ord('a'), ord('f')+1)))]
+save_paths = [os.path.join(sample_directory, f'listening_events-{i}.tsv.bz2') for i in list(range(0, 10)) + list(map(chr, range(ord('a'), ord('f')+1)))]
 
 
 found_users = 0
@@ -75,7 +73,7 @@ def process_tar_file(tar_path, save_path):
                     text_stream = io.TextIOWrapper(reader, encoding='utf-8')
                     for i, line in enumerate(text_stream):   
                         item = [user_id] + line.strip().split('\t')                   
-                        write_lines.append(item[:3] + item[4:])
+                        write_lines.append(item[:3] + item[4:]) # Saved columns are: user_id, timestamp, artist_id, item_id
 
             
             if len(savestate_members) >= 10000:
