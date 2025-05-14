@@ -4,6 +4,7 @@ This repository contains the code to reproduce the experiments from the paper: "
 
 As this work reproduces the work by [Ungruh et al.](https://link.springer.com/chapter/10.1007/978-3-031-88714-7_50), a lot of the code is based on the [repository of the reference work](https://github.com/rUngruh/PreferenceAnalysis).
 
+Additional Results not included in the main manuscript can be found in `Results/Additional_Results.md`.
 
 
 # Reproducibility Code
