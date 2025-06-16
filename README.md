@@ -188,7 +188,11 @@ conda install cudnn=7.6.5
 - Add processed dataset directories from the `data/processed` directory to `elliot/data`, i.e. `elliot/data/bx_rec_filtered`, `elliot/data/ml_rec_filtered`, and `elliot/data/mlhd_rec_filtered`
 - Add config files in `Experiment_2/configs` to `elliot/config_files`
 
-### Start Experiments
+### Hyperparameter Tuning & Experiments
+We follow hyperparameter tuning approach as suggested by [Anelli et al.](https://dl.acm.org/doi/abs/10.1145/3503252.3531292), selecting hyperparameter ranges in line with their exploration, see their config file [here](https://github.com/sisinflab/Top-N-Recommendation-Algorithms-A-Quest-for-the-State-of-the-Art/blob/master/config_files/reproducibility_config.yml). 
+With the prepared and split data, run the hyperparameter tuning using elliot and the respective config files for (i) the training set including all users, and (ii) the training set including solely child users. The six config files specify details about hyperparameter tuning. Run the following scripts.
+
+
 ```
 python start_experiments.py --config all_user_config_bx
 python start_experiments.py --config all_user_config_ml
@@ -198,7 +202,13 @@ python start_experiments.py --config child_config_ml
 python start_experiments.py --config child_config_mlhd
 ```
 
+Analyze the output from elliot; elliot returns the best model parameters. We select the best model based on nDCG@10 on the validation set (as specified in the config files). For simplicity, add the best model parameters in the `utils/best_models.json` (these currently include the best parameters as identified by our exploration).
+The post-processing scripts (i.e., the analysis of the results) automatically selects the best model's results of the experiments based on this file.
+
+
 ## Post-processing
+
+Start the analysis by computing the popularity of items in the datasets.
 
 ```
 conda activate 2025_RecSys_repro 
@@ -209,7 +219,7 @@ python compute_item_popularity.py --dataset bx
 python compute_item_popularity.py --dataset mlhd
 ```
 
-- For simplicity, add the identifying names of the best models in the `utils/best_models.json`.
+
 
 To compute genre distributions/popularity of profiles, run:
 ```
