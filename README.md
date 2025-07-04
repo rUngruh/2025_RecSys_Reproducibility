@@ -1,11 +1,18 @@
 # Impacts of Mainstream-Driven Algorithms on Recommendations for Children Across Domains: A Reproducibility Study
 
-This repository contains the code to reproduce the experiments from the paper: "Impacts of Mainstream-Driven Algorithms on Recommendations for Children Across Domains: A Reproducibility Study", submitted to RecSys 2025 Reproducibility track. 
+This repository contains the code to reproduce the experiments from the paper: "Impacts of Mainstream-Driven Algorithms on Recommendations for Children Across Domains: A Reproducibility Study" by Robin Ungruh, Alejandro Bellogín, Dominik Kowald, and Maria Soledad Pera, accepted as a full Reproducibility Paper at [RecSys 2025](https://recsys.acm.org/recsys25/).
 
 As this work reproduces the work by [Ungruh et al.](https://link.springer.com/chapter/10.1007/978-3-031-88714-7_50), a lot of the code is based on the [repository of the reference work](https://github.com/rUngruh/PreferenceAnalysis).
 
 Additional Results not included in the main manuscript can be found in `Results/Additional_Results.md`.
 
+
+# Abstract
+Children are often exposed to items curated by recommendation algorithms. Yet, research seldom considers children as a user group, and when it does, it is anchored on datasets where children are underrepresented, risking overlooking their interests, favoring those of the majority, i.e., mainstream users. Recently, Ungruh et al. demonstrated that children's consumption patterns and preferences differ from those of mainstream users, resulting in inconsistent recommendation algorithm performance and behavior for this user group. 
+These findings, however, are based on two datasets with a limited child user sample. We reproduce and replicate this study on a _wider range of datasets_ in the movie, music, and book _domains_, uncovering interaction patterns and aspects of child-recommender interactions consistent across domains, as well as those specific to some user samples in the data. We also extend insights from the original study with _popularity bias metrics_, given the interpretation of results from the original study. With this reproduction and extension, we uncover consumption patterns and differences between age groups stemming from intrinsic differences between children and others, and those unique to specific datasets or domains.
+
+# Citation
+Robin Ungruh, Alejandro Bellogín, Dominik Kowald, and Maria Soledad Pera. 2025. PImpacts of Mainstream-Driven Algorithms on Recommendations for Children Across Domains: A Reproducibility Study. In 19th ACM Conference on Recommender Systems (RecSys ’25), September 22–26, 2025, Prague, Czech Republic. ACM, New York, NY, USA, 10 pages. 
 
 # Reproducibility Code
 
