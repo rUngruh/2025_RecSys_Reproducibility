@@ -6,6 +6,7 @@ As this work reproduces the work by [Ungruh et al.](https://link.springer.com/ch
 
 Additional Results not included in the main manuscript can be found in `Results/Additional_Results.md`.
 
+For streamlined processing of the data samples for other experiments, we recommend using of [this repository](https://github.com/rUngruh/Dataset_Sample_Processing).
 
 # Abstract
 Children are often exposed to items curated by recommendation algorithms. Yet, research seldom considers children as a user group, and when it does, it is anchored on datasets where children are underrepresented, risking overlooking their interests, favoring those of the majority, i.e., mainstream users. Recently, Ungruh et al. demonstrated that children's consumption patterns and preferences differ from those of mainstream users, resulting in inconsistent recommendation algorithm performance and behavior for this user group. 
